@@ -1,0 +1,2 @@
+# Stretch: physics-informed NN residual on the degradation model (GPU laptop)
+torch>=2.2

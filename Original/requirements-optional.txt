@@ -1,0 +1,5 @@
+# Stretch scheduler (replaces the greedy heuristic in engine/scheduler.py)
+ortools>=9.9
+# Real LLM providers (pick per LLM_PROVIDER); Ollama needs no pip package
+anthropic>=0.34
+openai>=1.40

@@ -1,0 +1,73 @@
+@startuml EV_Battery_Intelligence_Activity
+title Industrial EV Battery Intelligence -- Telemetry-to-Action Activity Diagram
+
+|Battery / BMS|
+start
+:Sample pack telemetry
+(cell voltages, pack current,
+temperature, SOC, cycle count);
+
+repeat
+
+  |Ingestion Layer|
+  :Push telemetry tick
+  to time-series store;
+  :Derive features
+  (cell voltage spread,
+  cycles/day, calendar age,
+  rolling averages);
+
+  |AI / ML Layer|
+  fork
+    :Rule-based control-limit checks
+    (overvoltage, undervoltage,
+    overtemp / thermal runaway,
+    cell imbalance, sensor dropout);
+  fork again
+    :IsolationForest anomaly model
+    (multivariate outlier score
+    on voltage/current/temp/SOC);
+  fork again
+    :Gradient Boosting SOH regressor
+    predicts current SOH;
+    :Project SOH curve forward
+    to 80% end-of-life threshold;
+    :Estimate Remaining Useful Life
+    (cycles + calendar days);
+  end fork
+
+  :Merge rule + anomaly findings
+  into a fault list with severity;
+
+  |Backend API|
+  if (any fault detected?) then (yes)
+    :Attach fault(s) to vehicle state;
+    if (severity == CRITICAL?) then (yes)
+      :Raise critical alert;
+      :Trigger maintenance work-order
+      / fleet-ops notification;
+    else (no)
+      :Raise warning alert;
+    endif
+  else (no)
+    :Mark vehicle status HEALTHY;
+  endif
+
+  :Update fleet + vehicle
+  API state (SOC, SOH, RUL,
+  faults, status);
+
+  |Dashboard / Fleet Ops|
+  :Fleet overview, vehicle detail
+  and alerts views refresh
+  via polling;
+  if (critical alert?) then (yes)
+    :Fleet operator reviews vehicle,
+    schedules inspection / maintenance;
+  endif
+
+repeat while (fleet still operating?) is (yes)
+->no;
+
+stop
+@enduml

@@ -1,0 +1,28 @@
+# OS / archive cruft
+.DS_Store
+__MACOSX/
+.dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Node / frontend build output
+node_modules/
+dist/
+
+# logs
+*.log
+
+# local secrets / env
+.env
+!.env.example
+
+# local tool config
+.claude/
+
+# misc
+.Rhistory
